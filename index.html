@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>حجز موعد - Barbershop Chez Hicham</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        .app-wrapper {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #edf0f5;
+        }
+        .header h1 {
+            color: #1a2332;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header h1 i { color: #e67e22; }
+        .header-date {
+            background: #f0f2f5;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 14px;
+            border: 1px solid #edf0f5;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a2332;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .card-title .required {
+            color: #e74c3c;
+            font-size: 12px;
+        }
+
+        /* Form */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5a6f88;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .form-group label .required {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+        .form-group .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #dce3ec;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .form-group .input-wrapper:focus-within {
+            border-color: #1a2332;
+            box-shadow: 0 0 0 3px rgba(26,35,50,0.08);
+        }
+        .form-group .input-wrapper .input-icon {
+            padding: 0 10px;
+            color: #95a5a6;
+            font-size: 14px;
+            min-width: 35px;
+            text-align: center;
+            border-left: 1px solid #eef2f7;
+        }
+        .form-group .input-wrapper input {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: #1a2332;
+            outline: none;
+            min-width: 0;
+        }
+        .form-group .input-wrapper input::placeholder {
+            color: #b0bec5;
+            font-size: 13px;
+        }
+        .form-group .input-wrapper.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .form-group .error-msg {
+            color: #e74c3c;
+            font-size: 10px;
+            margin-top: 3px;
+            display: none;
+        }
+        .form-group .error-msg.show { display: block; }
+        .form-group .helper-text {
+            color: #888;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            width: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-success { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .btn-success:hover { background: linear-gradient(135deg, #2ecc71, #229954); }
+        .btn i { font-size: 15px; }
+
+        /* Worker Cards */
+        .worker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 6px 0;
+        }
+        .worker-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 2px solid #edf0f5;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        .worker-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.06); }
+        .worker-card.selected {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
+        .worker-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #27ae60;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .worker-card i { font-size: 28px; color: #1a2332; margin-bottom: 4px; display: block; }
+        .worker-card h4 { color: #1a2332; font-size: 13px; margin-bottom: 2px; }
+        .worker-card .worker-status { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+        .worker-card .worker-status.present { background: #d4edda; color: #155724; }
+
+        /* Services Display */
+        .services-display-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .service-display-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 6px;
+            text-align: center;
+            border: 2px solid #edf0f5;
+        }
+        .service-display-card i { font-size: 24px; color: #1a2332; margin-bottom: 3px; display: block; }
+        .service-display-card h4 { color: #1a2332; font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .service-display-card .price-tag { color: #27ae60; font-weight: 700; font-size: 12px; }
+
+        /* Messages */
+        #workerSelectionMsg {
+            margin-top: 6px;
+            color: #e74c3c;
+            display: none;
+            font-size: 12px;
+            text-align: center;
+            padding: 8px;
+            background: #fef9e7;
+            border-radius: 8px;
+            border: 1px solid #f9e79f;
+        }
+        #workerSelectionMsg i { margin-left: 4px; }
+        #bookingMsg {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .worker-required {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #fef9e7;
+            border-radius: 10px;
+            border: 1px solid #f9e79f;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #7d6608;
+        }
+        .worker-required i { color: #f39c12; font-size: 14px; }
+
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2332;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 2000;
+            display: none;
+            animation: slideUp 0.5s ease;
+            max-width: 90%;
+            text-align: center;
+        }
+        .notification-toast.show { display: block; }
+        .notification-toast i { margin-left: 6px; color: #27ae60; }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .app-wrapper { padding: 0; }
+            .header { padding: 10px 12px; }
+            .header h1 { font-size: 16px; }
+            .services-display-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .worker-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .service-display-card { padding: 10px 4px; }
+            .service-display-card i { font-size: 20px; }
+            .service-display-card h4 { font-size: 10px; }
+            .service-display-card .price-tag { font-size: 11px; }
+            .worker-card { padding: 10px 6px; }
+            .worker-card i { font-size: 24px; }
+            .worker-card h4 { font-size: 12px; }
+            .btn { font-size: 13px; padding: 10px 14px; }
+            .notification-toast { font-size: 12px; padding: 8px 16px; }
+        }
+        @media (max-width: 380px) {
+            .services-display-grid { grid-template-columns: 1fr 1fr; }
+            .worker-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+
+    <!-- Notification Toast -->
+    <div class="notification-toast" id="notificationToast">
+        <i class="fas fa-bell"></i> 
+        <span id="notificationMessage">تم حجز موعد جديد!</span>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fas fa-cut"></i> Barbershop Chez Hicham</h1>
+        <div class="header-date" id="clientDate"></div>
+    </div>
+
+    <!-- Services -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-th-large"></i> خدماتنا</div>
+        <div class="services-display-grid" id="servicesDisplayGrid"></div>
+    </div>
+
+    <!-- Choose Worker -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fas fa-user-tie"></i> اختر الحلاق 
+            <span class="required">* إجباري</span>
+        </div>
+        <div class="worker-required" id="workerRequiredAlert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>يجب اختيار حلاق قبل تأكيد الحجز</span>
+        </div>
+        <div class="worker-grid" id="workerGrid"></div>
+        <div id="workerSelectionMsg">
+            <i class="fas fa-exclamation-triangle"></i> 
+            الرجاء اختيار حلاق
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-calendar-check"></i> حجز موعد</div>
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> الاسم الكامل <span class="required">*</span></label>
+            <div class="input-wrapper">
+                <span class="input-icon"><i class="fas fa-user"></i></span>
+                <input type="text" id="clientFullName" placeholder="أدخل الاسم واللقب" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-phone"></i> رقم الهاتف <span class="required">*</span></label>
+            <div class="input-wrapper" id="phoneWrapper">
+                <span class="input-icon"><i class="fas fa-phone"></i></span>
+                <input type="tel" id="clientPhone" placeholder="05XX XX XX XX" maxlength="10" />
+            </div>
+            <div class="error-msg" id="phoneError">⚠️ رقم الهاتف يجب أن يكون 10 أرقام</div>
+            <div class="helper-text"><i class="fas fa-info-circle"></i> مثال: 0555123456</div>
+        </div>
+        <button class="btn btn-success" id="clientBookingBtn">
+            <i class="fas fa-check-circle"></i> تأكيد الحجز
+        </button>
+        <div id="bookingMsg"></div>
+    </div>
+
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+    (function() {
+        // ===== إعدادات فايربيس (Firebase Realtime Database) =====
+        const firebaseConfig = {
+            databaseURL: "https://coiffure-hicham-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        let db = null;
+        let isFirebaseConnected = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            isFirebaseConnected = true;
+        } catch (e) {
+            console.error("خطأ في الاتصال بقاعدة البيانات:", e);
+        }
+
+        // ===== البيانات المحلية والافتراضية =====
+        let workers = [];
+        let services = [
+            { name: 'حلاقة شعر', price: 500 },
+            { name: 'حلاقة لحية', price: 300 },
+            { name: 'بلاك', price: 700 },
+            { name: 'بروتين', price: 1200 },
+            { name: 'كيراتين', price: 1500 }
+        ];
+        let bookings = [];
+
+        let selectedWorkerId = null;
+
+        // ===== دوال مساعدة =====
+        function getActiveWorkers() {
+            return workers.filter(w => w.status === 'present');
+        }
+
+        function genId() {
+            return Date.now() + '_' + Math.random().toString(36).substr(2,4);
+        }
+
+        function today() {
+            const d = new Date();
+            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        }
+
+        function validatePhone(phone) {
+            const clean = phone.replace(/[\s\-]/g, '');
+            return /^[0-9]{10}$/.test(clean);
+        }
+
+        function cleanPhone(phone) {
+            return phone.replace(/[\s\-]/g, '');
+        }
+
+        function showNotification(message) {
+            const toast = document.getElementById('notificationToast');
+            const msgEl = document.getElementById('notificationMessage');
+            msgEl.textContent = message;
+            toast.classList.add('show');
+            if (navigator.vibrate) { navigator.vibrate([100, 50, 100]); }
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqFhYqF');
+                audio.play().catch(() => {});
+            } catch(e) {}
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // ============================================================
+        // عرض الخدمات
+        // ============================================================
+        function renderServices() {
+            const grid = document.getElementById('servicesDisplayGrid');
+            grid.innerHTML = '';
+            services.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'service-display-card';
+                card.innerHTML = `
+                    <i class="fas fa-cut"></i>
+                    <h4>${s.name}</h4>
+                    <span class="price-tag">${s.price} دج</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ============================================================
+        // عرض العمال
+        // ============================================================
+        function renderWorkers() {
+            const grid = document.getElementById('workerGrid');
+            grid.innerHTML = '';
+            const active = getActiveWorkers();
+            if (active.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:15px; color:#888; font-size:13px;">📭 لا يوجد عمال حاضرون حالياً</div>';
+                return;
+            }
+            active.forEach(w => {
+                const card = document.createElement('div');
+                card.className = `worker-card${selectedWorkerId === w.id ? ' selected' : ''}`;
+                card.dataset.id = w.id;
+                card.innerHTML = `
+                    <i class="fas fa-user"></i>
+                    <h4>${w.name}</h4>
+                    <span class="worker-status present">✅ حاضر</span>
+                `;
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.worker-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedWorkerId = this.dataset.id;
+                    document.getElementById('workerSelectionMsg').style.display = 'none';
+                    document.getElementById('workerRequiredAlert').style.display = 'none';
+                });
+                grid.appendChild(card);
+            });
+        }
+
+        // ============================================================
+        // حجز الزبون
+        // ============================================================
+        document.getElementById('clientBookingBtn').addEventListener('click', function() {
+            const fullName = document.getElementById('clientFullName').value.trim();
+            const phone = document.getElementById('clientPhone').value.trim();
+
+            // التحقق من اختيار حلاق
+            if (!selectedWorkerId) {
+                document.getElementById('workerSelectionMsg').style.display = 'block';
+                document.getElementById('workerSelectionMsg').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('workerRequiredAlert').style.display = 'flex';
+                return;
+            }
+
+            const worker = workers.find(w => w.id === selectedWorkerId);
+            if (!worker) {
+                alert('⚠️ الرجاء اختيار حلاق');
+                return;
+            }
+
+            // التحقق من الاسم
+            if (!fullName) {
+                showMsg('⚠️ الرجاء إدخال الاسم الكامل', 'error');
+                document.getElementById('clientFullName').focus();
+                return;
+            }
+
+            // التحقق من رقم الهاتف
+            if (!phone) {
+                showMsg('⚠️ الرجاء إدخال رقم الهاتف', 'error');
+                document.getElementById('clientPhone').focus();
+                document.getElementById('phoneWrapper').classList.add('error');
+                document.getElementById('phoneError').classList.add('show');
+                return;
+            }
+
+            if (!validatePhone(phone)) {
+                showMsg('⚠️ رقم الهاتف غير صحيح. يجب أن يكون 10 أرقام', 'error');
+                document.getElementById('clientPhone').focus();
+                document.getElementById('phoneWrapper').classList.add('error');
+                document.getElementById('phoneError').classList.add('show');
+                return;
+            }
+
+            // إنشاء الحجز
+            const bookingId = genId();
+            const newBooking = {
+                id: bookingId,
+                fullName: fullName,
+                name: fullName,
+                phone: cleanPhone(phone),
+                workerName: worker.name,
+                workerId: worker.id,
+                services: [],
+                total: 0,
+                date: today(),
+                status: 'pending'
+            };
+
+            // حفظ الحجز (عبر Firebase أو النسخ الاحتياطي المحلي)
+            if (isFirebaseConnected && db) {
+                db.ref('barber_bookings/' + bookingId).set(newBooking)
+                    .then(() => {
+                        handleBookingSuccess(fullName, worker.name);
+                    })
+                    .catch((error) => {
+                        console.error("فشل حفظ الحجز في قاعدة البيانات:", error);
+                        fallbackSaveBooking(newBooking, fullName, worker.name);
+                    });
+            } else {
+                fallbackSaveBooking(newBooking, fullName, worker.name);
+            }
+        });
+
+        function fallbackSaveBooking(newBooking, fullName, workerName) {
+            bookings.push(newBooking);
+            localStorage.setItem('barber_bookings', JSON.stringify(bookings));
+            handleBookingSuccess(fullName, workerName);
+        }
+
+        function handleBookingSuccess(fullName, workerName) {
+            showNotification('📢 حجز جديد: ' + fullName + ' عند ' + workerName);
+            showMsg('✅ تم حجز موعدك مع ' + workerName + '! في انتظار التأكيد.', 'success');
+
+            // إعادة ضبط النموذج
+            document.getElementById('clientFullName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('phoneWrapper').classList.remove('error');
+            document.getElementById('phoneError').classList.remove('show');
+            document.querySelectorAll('.worker-card').forEach(c => c.classList.remove('selected'));
+            selectedWorkerId = null;
+            document.getElementById('workerSelectionMsg').style.display = 'none';
+            document.getElementById('workerRequiredAlert').style.display = 'flex';
+        }
+
+        function showMsg(msg, type) {
+            const div = document.getElementById('bookingMsg');
+            div.textContent = msg;
+            div.style.display = 'block';
+            div.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
+            div.style.color = type === 'success' ? '#155724' : '#721c24';
+            div.style.border = '1px solid ' + (type === 'success' ? '#c3e6cb' : '#f5c6cb');
+            setTimeout(() => div.style.display = 'none', 5000);
+        }
+
+        // ============================================================
+        // التحقق من رقم الهاتف أثناء الكتابة
+        // ============================================================
+        document.getElementById('clientPhone').addEventListener('input', function() {
+            const phone = this.value;
+            const wrapper = document.getElementById('phoneWrapper');
+            const errorMsg = document.getElementById('phoneError');
+            if (phone.length > 0 && !validatePhone(phone)) {
+                wrapper.classList.add('error');
+                errorMsg.classList.add('show');
+            } else {
+                wrapper.classList.remove('error');
+                errorMsg.classList.remove('show');
+            }
+        });
+
+        document.getElementById('clientPhone').addEventListener('blur', function() {
+            const phone = this.value;
+            const wrapper = document.getElementById('phoneWrapper');
+            const errorMsg = document.getElementById('phoneError');
+            if (phone.length > 0 && !validatePhone(phone)) {
+                wrapper.classList.add('error');
+                errorMsg.classList.add('show');
+            } else {
+                wrapper.classList.remove('error');
+                errorMsg.classList.remove('show');
+            }
+        });
+
+        // ============================================================
+        // تحديث التاريخ
+        // ============================================================
+        function updateDate() {
+            const d = new Date();
+            const str = d.toLocaleDateString('ar-DZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('clientDate').textContent = str;
+        }
+
+        // ============================================================
+        // مزامنة البيانات مع Firebase Realtime Database
+        // ============================================================
+        function initRealtimeSync() {
+            if (isFirebaseConnected && db) {
+                // جلب ومزامنة العمال
+                db.ref('barber_workers').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        if (Array.isArray(data)) {
+                            workers = data.filter(Boolean);
+                        } else {
+                            workers = Object.values(data);
+                        }
+                    } else {
+                        workers = [];
+                    }
+                    renderWorkers();
+                }, (error) => {
+                    console.error("خطأ في قراءة العمال:", error);
+                    loadLocalFallbackData();
+                });
+
+                // جلب ومزامنة الخدمات
+                db.ref('barber_services').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        if (Array.isArray(data)) {
+                            services = data.filter(Boolean);
+                        } else {
+                            services = Object.values(data);
+                        }
+                    }
+                    renderServices();
+                }, (error) => {
+                    console.error("خطأ في قراءة الخدمات:", error);
+                });
+
+                // جلب الحجوزات
+                db.ref('barber_bookings').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        if (Array.isArray(data)) {
+                            bookings = data.filter(Boolean);
+                        } else {
+                            bookings = Object.values(data);
+                        }
+                    } else {
+                        bookings = [];
+                    }
+                });
+            } else {
+                loadLocalFallbackData();
+            }
+        }
+
+        function loadLocalFallbackData() {
+            workers = JSON.parse(localStorage.getItem('barber_workers')) || [];
+            const savedServices = JSON.parse(localStorage.getItem('barber_services'));
+            if (savedServices) services = savedServices;
+            bookings = JSON.parse(localStorage.getItem('barber_bookings')) || [];
+            renderServices();
+            renderWorkers();
+        }
+
+        updateDate();
+        initRealtimeSync();
+    })();
+</script>
+</body>
+</html>

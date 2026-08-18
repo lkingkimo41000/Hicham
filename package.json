@@ -1,0 +1,14 @@
+{
+  "name": "barber-chop-client",
+  "version": "1.0.0",
+  "displayName": "Barber Chop",
+  "description": "تطبيق حجز موعد - Barbershop Chez Hicham",
+  "devDependencies": {
+    "cordova-android": "^13.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ]
+  }
+}
